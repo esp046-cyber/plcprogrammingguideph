@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC Programming Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 1%;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 1%;
+            border-radius: 4px;
+            margin-bottom: 1%;
+            border-left: 3px solid #4CAF50;
+        }
+        
+        .header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1%;
+            margin-bottom: 1%;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .tabs::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+        
+        .tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            font-weight: 600;
+        }
+        
+        .content {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            padding: 1%;
+            max-height: 75vh;
+            overflow-y: auto;
+            min-height: 300px;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .section.active {
+            display: block !important;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid #FF9800;
+            padding: 12px;
+            margin-bottom: 1%;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .card h3 {
+            font-size: 14px;
+            color: #FF9800;
+            margin-bottom: 8px;
+        }
+        
+        .card p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            overflow-x: auto;
+            color: #4CAF50;
+        }
+        
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .expandable-content.expanded {
+            max-height: 2000px;
+        }
+        
+        .list-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-size: 12px;
+            border-left: 2px solid #2196F3;
+        }
+        
+        .warning {
+            background: rgba(255, 152, 0, 0.2);
+            border-left: 3px solid #FF9800;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .tip {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 3px solid #4CAF50;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ PLC Programming Guide</h1>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showSection('basics')">Basics</div>
+        <div class="tab" onclick="showSection('ladder')">Ladder Logic</div>
+        <div class="tab" onclick="showSection('instructions')">Instructions</div>
+        <div class="tab" onclick="showSection('datatypes')">Data Types</div>
+        <div class="tab" onclick="showSection('programming')">Programming</div>
+        <div class="tab" onclick="showSection('advanced')">Advanced</div>
+        <div class="tab" onclick="showSection('control')">Control</div>
+        <div class="tab" onclick="showSection('applications')">Applications</div>
+        <div class="tab" onclick="showSection('hardware')">Hardware</div>
+        <div class="tab" onclick="showSection('industry')">Industry</div>
+        <div class="tab" onclick="showSection('troubleshoot')">Troubleshooting</div>
+    </div>
+    
+    <div class="content">
+        <!-- Basics Section -->
+        <div id="basics" class="section active" style="display: block;">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>What is a PLC?</h3>
+                <p>Programmable Logic Controllers are industrial computers...</p>
+                <div class="expandable-content">
+                    <p>A PLC is a ruggedized computer used for industrial automation. It continuously monitors input devices (sensors, switches) and makes decisions based on a custom program to control output devices (motors, lights, valves).</p>
+                    <div class="tip">💡 PLCs are designed for harsh industrial environments with extreme temperatures, vibration, and electrical noise.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>PLC Components</h3>
+                <p>Essential parts of every PLC system...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>CPU:</strong> Executes the control program</div>
+                    <div class="list-item"><strong>Input Modules:</strong> Interface with sensors and switches</div>
+                    <div class="list-item"><strong>Output Modules:</strong> Control actuators and indicators</div>
+                    <div class="list-item"><strong>Power Supply:</strong> Provides regulated power</div>
+                    <div class="list-item"><strong>Programming Device:</strong> Computer or HMI for programming</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>PLC Scan Cycle</h3>
+                <p>How PLCs execute programs...</p>
+                <div class="expandable-content">
+                    <p>The PLC operates in a continuous loop:</p>
+                    <div class="code-block">1. READ INPUTS → Store in memory
+2. EXECUTE PROGRAM → Process logic
+3. UPDATE OUTPUTS → Send to devices
+4. HOUSEKEEPING → Check system
+5. REPEAT...</div>
+                    <div class="warning">⚠️ Scan time typically ranges from 1-20ms depending on program complexity.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ladder Logic Section -->
+        <div id="ladder" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Ladder Logic Fundamentals</h3>
+                <p>The most common PLC programming language...</p>
+                <div class="expandable-content">
+                    <p>Ladder Logic resembles electrical relay circuits with rungs. Each rung represents a control statement with inputs (contacts) on the left and outputs (coils) on the right.</p>
+                    <div class="code-block">|--[ ]--[ ]--( )--|  Normally Open contacts
+|--[/]--[/]--( )--|  Normally Closed contacts
+|--[P]------------|  Positive edge trigger</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Basic Contacts</h3>
+                <p>Input instructions in ladder logic...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>XIC (Examine If Closed):</strong> --[ ]-- Passes power when input is ON</div>
+                    <div class="list-item"><strong>XIO (Examine If Open):</strong> --[/]-- Passes power when input is OFF</div>
+                    <div class="list-item"><strong>OSR (One Shot Rising):</strong> Triggers once on rising edge</div>
+                    <div class="tip">💡 Contacts can represent physical inputs or internal memory bits.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Output Instructions</h3>
+                <p>Controlling outputs and memory...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>OTE (Output Energize):</strong> --( )-- Standard output coil</div>
+                    <div class="list-item"><strong>OTL (Output Latch):</strong> --(L)-- Sets and holds ON</div>
+                    <div class="list-item"><strong>OTU (Output Unlatch):</strong> --(U)-- Resets latched output</div>
+                    <div class="code-block">Example Start/Stop Circuit:
+|--[START]--[STOP]---(RUN)--|
+|--[RUN]----[/STOP]---------|</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Series vs Parallel</h3>
+                <p>Logic combinations...</p>
+                <div class="expandable-content">
+                    <div class="code-block">SERIES (AND Logic):
+|--[A]--[B]--( OUT )--|
+
+PARALLEL (OR Logic):
+|--[A]--------( OUT )--|
+|--[B]-----------------|</div>
+                    <p>Series = ALL conditions must be true. Parallel = ANY condition can be true.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions Section -->
+        <div id="instructions" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Timer Instructions</h3>
+                <p>Time-based control operations...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>TON (Timer On-Delay):</strong> Delays turning ON</div>
+                    <div class="list-item"><strong>TOF (Timer Off-Delay):</strong> Delays turning OFF</div>
+                    <div class="list-item"><strong>RTO (Retentive Timer):</strong> Accumulates time across cycles</div>
+                    <div class="code-block">TON Parameters:
+- Timer: T4:0
+- Time Base: 0.01 (10ms increments)
+- Preset: 500 (5 seconds)
+- Accumulated: Current count</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Counter Instructions</h3>
+                <p>Counting events and cycles...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>CTU (Count Up):</strong> Increments count on each trigger</div>
+                    <div class="list-item"><strong>CTD (Count Down):</strong> Decrements count</div>
+                    <div class="list-item"><strong>RES (Reset):</strong> Clears accumulated value</div>
+                    <div class="warning">⚠️ Counters retain values through power loss if retentive memory is used.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Math Instructions</h3>
+                <p>Arithmetic operations...</p>
+                <div class="expandable-content">
+                    <div class="list-item">ADD - Addition</div>
+                    <div class="list-item">SUB - Subtraction</div>
+                    <div class="list-item">MUL - Multiplication</div>
+                    <div class="list-item">DIV - Division</div>
+                    <div class="list-item">SQR - Square Root</div>
+                    <div class="code-block">Example:
+ADD
+Source A: N7:0
+Source B: N7:1
+Dest: N7:2</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Compare Instructions</h3>
+                <p>Comparison operations...</p>
+                <div class="expandable-content">
+                    <div class="list-item">EQU - Equal (A = B)</div>
+                    <div class="list-item">NEQ - Not Equal (A ≠ B)</div>
+                    <div class="list-item">GRT - Greater Than (A > B)</div>
+                    <div class="list-item">LES - Less Than (A < B)</div>
+                    <div class="list-item">GEQ - Greater or Equal (A ≥ B)</div>
+                    <div class="list-item">LEQ - Less or Equal (A ≤ B)</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Move Instructions</h3>
+                <p>Data transfer operations...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>MOV:</strong> Copy value from source to destination</div>
+                    <div class="list-item"><strong>MVM:</strong> Masked move with bit filtering</div>
+                    <div class="list-item"><strong>CLR:</strong> Clear destination to zero</div>
+                    <div class="tip">💡 Use MOV to initialize values or transfer data between memory locations.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Types Section -->
+        <div id="datatypes" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Memory Addressing</h3>
+                <p>How PLCs organize data...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Common Address Formats:
+I:0/0  - Input bit (slot:word/bit)
+O:0/0  - Output bit
+B3:0/0 - Binary/Bit file
+T4:0   - Timer file
+C5:0   - Counter file
+N7:0   - Integer file
+F8:0   - Floating point file</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Data Types</h3>
+                <p>Variable types in PLCs...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>BOOL:</strong> Binary (0 or 1)</div>
+                    <div class="list-item"><strong>INT:</strong> 16-bit integer (-32768 to 32767)</div>
+                    <div class="list-item"><strong>DINT:</strong> 32-bit integer</div>
+                    <div class="list-item"><strong>REAL:</strong> Floating point number</div>
+                    <div class="list-item"><strong>STRING:</strong> Text characters</div>
+                    <div class="warning">⚠️ Data type mismatches can cause program errors or unexpected behavior.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Bit Manipulation</h3>
+                <p>Working with individual bits...</p>
+                <div class="expandable-content">
+                    <div class="list-item">AND - Bitwise AND operation</div>
+                    <div class="list-item">OR - Bitwise OR operation</div>
+                    <div class="list-item">XOR - Bitwise exclusive OR</div>
+                    <div class="list-item">NOT - Bitwise complement</div>
+                    <div class="list-item">BTD - Bit field distribute</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Programming Techniques Section -->
+        <div id="programming" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Subroutines & Functions</h3>
+                <p>Organizing code for reusability...</p>
+                <div class="expandable-content">
+                    <p>Break large programs into manageable, reusable blocks:</p>
+                    <div class="list-item"><strong>Subroutines (SBR):</strong> Called sections of code that return to caller</div>
+                    <div class="list-item"><strong>Jump to Subroutine (JSR):</strong> Instruction to call subroutine</div>
+                    <div class="list-item"><strong>Return (RET):</strong> Returns from subroutine to main</div>
+                    <div class="code-block">Main Program:
+|--[Condition]--[JSR SBR:3]--|
+                Input: N7:0
+                
+Subroutine 3:
+|--[Process N7:0]--( )--|
+|--[Calculate]------( )--|
+|--[RET]----------------|
+
+Benefits:
+- Reuse code multiple times
+- Easier troubleshooting
+- Modular design
+- Team collaboration</div>
+                    <div class="tip">💡 Name subroutines descriptively: "Tank_Fill_Sequence" not "SBR_5"</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Passing Parameters</h3>
+                <p>Sending data to subroutines...</p>
+                <div class="expandable-content">
+                    <div class="code-block">JSR with Parameters:
+JSR Subroutine: CALC_AVG
+  Input Param: Sensor_Array[0]
+  Input Param: Array_Size
+  Return Param: Average_Value
+
+Inside Subroutine:
+- Access via parameter tags
+- Perform calculations
+- Store result in return parameter
+- RET sends back to caller</div>
+                    <div class="list-item">Input parameters: Data sent TO subroutine</div>
+                    <div class="list-item">Return parameters: Results sent BACK to main</div>
+                    <div class="list-item">Local variables: Only exist within subroutine</div>
+                    <div class="warning">⚠️ Limit to 3-5 parameters per subroutine for clarity.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Interrupts & Events</h3>
+                <p>High-priority task handling...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Periodic Task:</strong> Executes at fixed intervals (10ms, 100ms)</div>
+                    <div class="list-item"><strong>Event Task:</strong> Triggered by specific conditions</div>
+                    <div class="list-item"><strong>Hardware Interrupt:</strong> Input change triggers immediate response</div>
+                    <div class="code-block">Interrupt Types:
+STI - Selectable Timed Interrupt
+  Execute every X milliseconds
+  
+EII - Event Input Interrupt  
+  Triggered by input transition
+  Response time < 1ms
+  
+Fault Routine:
+  Executes on major faults
+  Log error, attempt recovery</div>
+                    <div class="warning">⚠️ Keep interrupt routines SHORT - they pause main program execution!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Arrays & Data Tables</h3>
+                <p>Managing multiple similar values...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Array Declaration:
+Temperatures[10] : REAL
+  Index 0-9 for 10 sensors
+  
+Accessing Arrays:
+Direct: Temperatures[5]
+Indirect: Temperatures[Index]
+
+Example Loop:
+FOR Index := 0 TO 9 DO
+  IF Temperatures[Index] > 100 THEN
+    Alarms[Index] := TRUE;
+  END_IF;
+END_FOR;</div>
+                    <div class="list-item">Use arrays for sensors of same type</div>
+                    <div class="list-item">Recipe storage in 2D arrays</div>
+                    <div class="list-item">Historical data buffering</div>
+                    <div class="tip">💡 Arrays make code scalable - add sensors without rewriting logic!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Indirect Addressing</h3>
+                <p>Dynamic memory access using pointers...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Direct Addressing:
+MOV N7:5 to N7:10
+
+Indirect Addressing:
+Pointer = 5
+MOV N7:[Pointer] to N7:10
+
+Benefits:
+- Loop through data tables
+- Dynamic recipe selection
+- Flexible addressing
+
+Example:
+FOR i := 0 TO 15 DO
+  MOV Input[i] TO Output[i]
+END_FOR;</div>
+                    <div class="warning">⚠️ Validate pointer values to prevent accessing invalid addresses!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>String Handling</h3>
+                <p>Text manipulation and parsing...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>String Operations:</strong> Concatenate, extract, search, compare</div>
+                    <div class="code-block">Common String Instructions:
+CONCAT - Join strings
+  "Batch" + "001" = "Batch001"
+
+MID - Extract substring
+  MID("Product123", 8, 3) = "123"
+
+FIND - Search for text
+  FIND("Error:Timeout", "Error") = 0
+
+LEN - Get string length
+  LEN("Hello") = 5
+
+String_To_Int / Int_To_String
+  Convert between types</div>
+                    <div class="tip">💡 Use strings for barcode reading, RFID tags, and operator messages.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>File Operations & Data Logging</h3>
+                <p>Storing data to SD card or network...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Data Logging Example:
+Open File: "Production.csv"
+Write Header: "Date,Time,Count,Temp"
+
+Every Hour:
+  Get Current DateTime
+  Format: "2025-01-12,14:30,1250,85.5"
+  Write Line to File
+  
+Close File on program stop
+
+Storage Locations:
+- PLC SD card
+- Network drive
+- USB device
+- FTP server</div>
+                    <div class="list-item">Log alarms with timestamps</div>
+                    <div class="list-item">Production reports in CSV format</div>
+                    <div class="list-item">Batch records for traceability</div>
+                    <div class="warning">⚠️ Monitor storage space - implement file rotation or archiving!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Error Handling & Recovery</h3>
+                <p>Graceful fault management...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Try-Catch Pattern (ST):
+ErrorFlag := FALSE;
+
+IF DivideValue = 0 THEN
+  ErrorFlag := TRUE;
+  ErrorCode := 101;
+  Result := 0;
+ELSE
+  Result := Numerator / DivideValue;
+END_IF;
+
+Fault Routine:
+- Log fault code and timestamp
+- Attempt automatic recovery
+- Alert operator if needed
+- Safe state shutdown if critical</div>
+                    <div class="list-item">Validate inputs before processing</div>
+                    <div class="list-item">Set default values on errors</div>
+                    <div class="list-item">Implement watchdog timers</div>
+                    <div class="tip">💡 Always plan for failure modes - systems WILL fault eventually!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Code Optimization</h3>
+                <p>Improving scan time and efficiency...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Put frequently true conditions first in AND logic</div>
+                    <div class="list-item">Use one-shot instructions to prevent repeated execution</div>
+                    <div class="list-item">Move complex math to periodic tasks</div>
+                    <div class="list-item">Avoid excessive communication reads in main loop</div>
+                    <div class="code-block">Optimization Example:
+BEFORE (slow):
+Every scan calculate:
+  Average = (A+B+C+D+E) / 5
+  
+AFTER (fast):
+Only when value changes:
+  Sum = A+B+C+D+E
+  Average = Sum / 5
+
+Typical Scan Times:
+Simple: 1-5ms
+Medium: 5-20ms  
+Complex: 20-100ms</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Modular Programming</h3>
+                <p>Structured code organization...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Main Routine:</strong> Program coordination and calls</div>
+                    <div class="list-item"><strong>Input Processing:</strong> Read and scale sensors</div>
+                    <div class="list-item"><strong>Control Logic:</strong> State machines and sequences</div>
+                    <div class="list-item"><strong>Output Processing:</strong> Drive actuators and indicators</div>
+                    <div class="list-item"><strong>Diagnostics:</strong> Monitoring and alarms</div>
+                    <div class="code-block">Program Structure:
+MAIN
+├── JSR Input_Module
+├── JSR Safety_Check  
+├── JSR Control_Logic
+├── JSR Alarm_Handler
+└── JSR Output_Module
+
+Each module is self-contained
+Clear interfaces between modules</div>
+                    <div class="tip">💡 A well-structured program is easier to troubleshoot and modify!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced Control Section -->
+        <div id="control" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>PLC to PLC Communication</h3>
+                <p>Data exchange between controllers...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Message (MSG) Instructions:</strong> Read/write data to remote PLCs</div>
+                    <div class="list-item"><strong>Producer/Consumer Tags:</strong> Broadcast data on network</div>
+                    <div class="list-item"><strong>Explicit Messaging:</strong> Request/response pattern</div>
+                    <div class="code-block">MSG Instruction Setup:
+Message Type: CIP Data Table Write
+Target: Remote PLC IP address
+Source: Local_Data_Array[0]
+Destination: Remote_Array[0]
+Size: 10 integers
+
+Communication Path:
+1,192.168.1.50 (Ethernet/IP)
+
+Trigger: Execute on data change
+Status: Monitor .DN and .ER bits</div>
+                    <div class="tip">💡 Use producer/consumer for time-critical data, MSG for occasional transfers.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>VFD Control (Variable Frequency Drive)</h3>
+                <p>Motor speed and torque control...</p>
+                <div class="expandable-content">
+                    <div class="code-block">VFD Control Methods:
+1. Digital I/O:
+   Start/Stop: Digital outputs
+   Speed: 3-speed via multi-input
+   
+2. Analog Control:
+   Speed: 0-10V or 4-20mA
+   0V = 0 Hz, 10V = 60 Hz
+   Scaling required
+   
+3. Network Control:
+   Modbus RTU/TCP
+   Ethernet/IP
+   Profibus</div>
+                    <div class="list-item">Acceleration/Deceleration ramp times</div>
+                    <div class="list-item">Monitor current, frequency, faults</div>
+                    <div class="list-item">Implement soft start for mechanical protection</div>
+                    <div class="code-block">Speed Scaling:
+Desired_Hz = 45 Hz (0-60 range)
+Output_Percent = 45/60 = 75%
+Analog_Out = 7.5V (0-10V range)
+
+PLC Code:
+Percent = Speed_SP / Max_Speed
+AO_Value = Percent * AO_Max</div>
+                    <div class="warning">⚠️ Configure proper overload and fault parameters in VFD!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Pneumatic Control</h3>
+                <p>Compressed air system automation...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Solenoid Valves:</strong> 3/2, 5/2, 5/3 configurations</div>
+                    <div class="list-item"><strong>Cylinder Types:</strong> Single-acting, double-acting, rodless</div>
+                    <div class="list-item"><strong>Sensors:</strong> Reed switches, proximity sensors for position</div>
+                    <div class="code-block">Double-Acting Cylinder Logic:
+|--[Extend_Cmd]--[/Retracted]--( Extend_Sol )|
+|--[Extend_Sol]--[/Extended]----------------|
+
+|--[Retract_Cmd]--[/Extended]--( Retract_Sol )|
+|--[Retract_Sol]--[/Retracted]----------------|
+
+Position Feedback:
+Extended_Sensor confirms movement
+Timeout if not reached in 2 seconds</div>
+                    <div class="tip">💡 Add time delays between reversals to prevent valve chatter.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Hydraulic Control</h3>
+                <p>High-force fluid power systems...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Proportional valves for variable flow control</div>
+                    <div class="list-item">Pressure control and regulation</div>
+                    <div class="list-item">Flow compensation for load changes</div>
+                    <div class="list-item">Pressure sensors for force monitoring</div>
+                    <div class="code-block">Pressure Control Loop:
+Read: Pressure_Sensor (0-3000 PSI)
+Setpoint: 2000 PSI
+Error: SP - PV
+
+PID_Output controls proportional valve
+Valve position: 0-100%
+
+Monitor for leaks:
+IF Pressure_Drop > 50 PSI/min THEN
+  Leak_Alarm := TRUE
+END_IF</div>
+                    <div class="warning">⚠️ Hydraulics can be dangerous - always implement pressure relief valves!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Vision System Integration</h3>
+                <p>Camera inspection and measurement...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Trigger camera at correct product position</div>
+                    <div class="list-item">Receive pass/fail results</div>
+                    <div class="list-item">Coordinate reject mechanisms</div>
+                    <div class="list-item">Track parts through system</div>
+                    <div class="code-block">Vision Sequence:
+1. Product detected (photoeye)
+2. Delay for position (encoder/timer)
+3. PLC triggers camera (output pulse)
+4. Vision processes image (100-500ms)
+5. Results sent to PLC (pass/fail)
+6. Activate reject if fail (downstream)
+
+Communication:
+- Digital I/O (simple pass/fail)
+- Serial/Ethernet (detailed results)
+- EtherNet/IP for cognex cameras</div>
+                    <div class="tip">💡 Use encoder position for accurate triggering on moving conveyors.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Weighing & Load Cell Systems</h3>
+                <p>Precision weight measurement and control...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Load Cell Setup:
+Sensor: 0-500 kg capacity
+Output: 4-20mA signal
+Resolution: 0.1 kg
+
+Calibration:
+Zero (tare): Empty weight
+Span: Known test weight
+
+Formula:
+Weight = ((Signal-Zero)/Span) * Capacity
+
+Filtering:
+Use moving average (5-10 samples)
+Reduces noise and vibration</code>
+                    <div class="list-item"><strong>Batching Control:</strong> Fill to target weight with dribble feed</div>
+                    <div class="list-item"><strong>Check Weighing:</strong> Verify product weight in tolerance</div>
+                    <div class="list-item"><strong>Loss-in-Weight:</strong> Continuous feeding based on rate</div>
+                    <div class="code-block">Batch Fill Logic:
+Fast Fill: Weight < (Target - 5kg)
+Dribble Fill: Weight < Target
+Stop: Weight >= Target
+
+Account for in-flight material
+Adjust for temperature drift</div>
+                    <div class="warning">⚠️ Calibrate regularly - accuracy drifts over time!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>High-Speed Counting</h3>
+                <p>Encoder and frequency input processing...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Encoders:</strong> Track position, speed, direction</div>
+                    <div class="list-item"><strong>Frequency Input:</strong> RPM, flow meters, tachometers</div>
+                    <div class="list-item"><strong>Up/Down Counters:</strong> Bidirectional counting</div>
+                    <div class="code-block">HSC Configuration:
+Mode: Quadrature (A/B channels)
+Max Frequency: 100 kHz
+Pulses per Rev: 1024 (encoder)
+Z-Index: Reset reference
+
+Position Calculation:
+Counts / PPR = Revolutions
+Revolutions * Circumference = Distance
+
+Speed Calculation:
+RPM = (Counts/Time) * 60 / PPR</div>
+                    <div class="tip">💡 Use hardware counters for speeds > 1 kHz - scan time too slow!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Multi-Axis Coordination</h3>
+                <p>Synchronized motion control...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Electronic Gearing:</strong> Slave follows master at fixed ratio</div>
+                    <div class="list-item"><strong>Electronic Camming:</strong> Non-linear relationship profile</div>
+                    <div class="list-item"><strong>Position Sync:</strong> Match positions at specific points</div>
+                    <div class="code-block">Gearing Example:
+Master: Conveyor encoder
+Slave: Cutting knife servo
+
+Gear Ratio: 2:1
+Knife rotates twice per conveyor rev
+
+Applications:
+- Print registration
+- Flying shear cutting
+- Wrapping machines
+- Bottling lines</div>
+                    <div class="list-item">Virtual master axis for complex patterns</div>
+                    <div class="list-item">Phase adjustment for registration</div>
+                    <div class="warning">⚠️ Ensure mechanical limits prevent collisions during motion!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Barcode & RFID Integration</h3>
+                <p>Automatic identification systems...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Barcode Scanner:
+Connection: Serial (RS-232/485)
+Baud: 9600-115200
+Protocol: ASCII string
+
+Trigger: 
+- External (PLC output)
+- Continuous scan
+- Presentation mode
+
+Data Format:
+"PRODUCT123<CR><LF>"
+
+PLC Processing:
+1. Receive string via serial
+2. Parse data (remove CR/LF)
+3. Validate format/checksum
+4. Store in database/forward
+5. Confirm read (feedback light)</code>
+                    <div class="list-item"><strong>RFID:</strong> Read/write tags without line-of-sight</div>
+                    <div class="list-item"><strong>Applications:</strong> Traceability, work-in-process tracking, tool ID</div>
+                    <div class="tip">💡 Use error checking - not all reads are successful!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Temperature Control Advanced</h3>
+                <p>Precision thermal management...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Cascade Control:</strong> Inner loop (fast) controls outer loop (slow)</div>
+                    <div class="list-item"><strong>Feedforward:</strong> Anticipate disturbances before they affect process</div>
+                    <div class="list-item"><strong>Ratio Control:</strong> Maintain proportional relationship</div>
+                    <div class="code-block">Cascade Example:
+Primary Loop: Tank temperature SP
+Secondary Loop: Heating element temp
+
+Benefits:
+- Faster disturbance rejection
+- Better setpoint tracking
+- Reduced overshoot
+
+Thermocouple Types:
+Type K: -200 to 1350°C (general)
+Type J: -40 to 750°C (iron/constant)
+Type T: -200 to 350°C (copper)
+RTD: -200 to 850°C (most accurate)</div>
+                    <div class="warning">⚠️ Cold junction compensation required for thermocouples!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced PLC Topics Section -->
+        <div id="advanced" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Communication Protocols</h3>
+                <p>Industrial networking standards...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Modbus RTU/TCP:</strong> Serial/Ethernet protocol for device communication</div>
+                    <div class="list-item"><strong>Ethernet/IP:</strong> Industrial protocol by Rockwell, uses standard Ethernet</div>
+                    <div class="list-item"><strong>Profibus/Profinet:</strong> Siemens protocols for automation</div>
+                    <div class="list-item"><strong>DeviceNet:</strong> CAN-based network for sensors/actuators</div>
+                    <div class="list-item"><strong>OPC UA:</strong> Platform-independent data exchange</div>
+                    <div class="tip">💡 Choose protocol based on speed requirements, distance, and device compatibility.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Modbus Basics</h3>
+                <p>Most common industrial protocol...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Function Codes:
+01 - Read Coils (outputs)
+02 - Read Discrete Inputs
+03 - Read Holding Registers
+04 - Read Input Registers
+05 - Write Single Coil
+06 - Write Single Register
+15 - Write Multiple Coils
+16 - Write Multiple Registers</div>
+                    <div class="warning">⚠️ Modbus has no built-in security - use on protected networks only.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>HMI Integration</h3>
+                <p>Connecting displays to PLCs...</p>
+                <div class="expandable-content">
+                    <p>HMI (Human-Machine Interface) provides visualization and control. Key considerations:</p>
+                    <div class="list-item">Tag-based addressing for data exchange</div>
+                    <div class="list-item">Screen navigation and alarm displays</div>
+                    <div class="list-item">Trend graphs for process monitoring</div>
+                    <div class="list-item">Security levels for operator access</div>
+                    <div class="list-item">Recipe management for batch processes</div>
+                    <div class="tip">💡 Keep HMI screens simple and intuitive - operators need quick access to critical info.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Analog I/O Processing</h3>
+                <p>Working with continuous signals...</p>
+                <div class="expandable-content">
+                    <div class="code-block">4-20mA Scaling Formula:
+Eng_Value = ((Raw - Raw_Min) / 
+            (Raw_Max - Raw_Min)) * 
+            (Eng_Max - Eng_Min) + Eng_Min
+
+Example: 0-100°C from 4-20mA
+Raw: 6225-31208 (12-bit)
+Scaled: 0-100°C</div>
+                    <div class="list-item"><strong>Resolution:</strong> 12-bit = 4096 counts, 16-bit = 65536 counts</div>
+                    <div class="list-item"><strong>Update Rate:</strong> Typically 100-250ms per channel</div>
+                    <div class="warning">⚠️ Always calibrate analog inputs - environmental factors affect accuracy.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>PID Control</h3>
+                <p>Process control fundamentals...</p>
+                <div class="expandable-content">
+                    <p>PID = Proportional + Integral + Derivative control for maintaining setpoints.</p>
+                    <div class="code-block">PID Formula:
+Output = Kp*Error + 
+         Ki*∫Error*dt + 
+         Kd*(dError/dt)
+
+Kp = Proportional Gain
+Ki = Integral Gain
+Kd = Derivative Gain</div>
+                    <div class="list-item"><strong>P:</strong> Immediate response to current error</div>
+                    <div class="list-item"><strong>I:</strong> Eliminates steady-state error over time</div>
+                    <div class="list-item"><strong>D:</strong> Dampens oscillations, predicts future error</div>
+                    <div class="tip">💡 Start tuning with P only, then add I, finally add D if needed.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>PID Tuning Methods</h3>
+                <p>Getting optimal control performance...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Manual Tuning:</strong> Adjust Kp until stable oscillation, then add Ki and Kd</div>
+                    <div class="list-item"><strong>Ziegler-Nichols:</strong> Mathematical method using ultimate gain</div>
+                    <div class="list-item"><strong>Auto-Tune:</strong> Built-in PLC function for automatic tuning</div>
+                    <div class="warning">⚠️ Never tune PID on a live production process - use simulation or off-hours.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Structured Text (ST)</h3>
+                <p>High-level PLC programming language...</p>
+                <div class="expandable-content">
+                    <div class="code-block">IF Temperature > 100 THEN
+    Heater := FALSE;
+    Alarm := TRUE;
+ELSIF Temperature < 50 THEN
+    Heater := TRUE;
+    Alarm := FALSE;
+ELSE
+    Heater := LastState;
+END_IF;
+
+FOR i := 1 TO 10 DO
+    Array[i] := i * 2;
+END_FOR;</div>
+                    <p>ST is ideal for complex math, data handling, and algorithms that are difficult in ladder logic.</p>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Function Block Diagram (FBD)</h3>
+                <p>Graphical programming for process control...</p>
+                <div class="expandable-content">
+                    <p>FBD uses blocks connected by signal lines, similar to electronic circuit diagrams. Great for:</p>
+                    <div class="list-item">Process control applications</div>
+                    <div class="list-item">PID loop implementation</div>
+                    <div class="list-item">Complex calculations</div>
+                    <div class="list-item">Signal processing</div>
+                    <div class="tip">💡 FBD is more intuitive than ladder logic for engineers with electronics background.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Practical Applications Section -->
+        <div id="applications" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>⚡ TEST - Applications Section Active</h3>
+                <p>If you see this, the Applications section is working!</p>
+                <div class="expandable-content">
+                    <p>This is test content to verify the section loads properly.</p>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Motor Control Circuits</h3>
+                <p>Common motor control patterns...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Forward/Reverse Motor Control:
+|--[FWD_PB]--[/REV]--[/STOP]--(FWD)|
+|--[FWD]-----[/REV]--[/STOP]-------|
+|
+|--[REV_PB]--[/FWD]--[/STOP]--(REV)|
+|--[REV]-----[/FWD]--[/STOP]-------|
+
+Star-Delta Starter:
+1. Close STAR contactor
+2. Close MAIN contactor
+3. Wait 5-10 seconds (TON)
+4. Open STAR, Close DELTA</div>
+                    <div class="warning">⚠️ Always include interlocks to prevent forward and reverse simultaneously!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Conveyor System Logic</h3>
+                <p>Belt and roller conveyor control...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Multi-Zone Conveyor:
+Zone1_Run = START AND 
+            NOT_ESTOP AND 
+            NOT_Zone1_Full
+
+Zone2_Run = Zone1_Run AND 
+            NOT_Zone2_Full AND
+            Zone2_Request
+
+// Cascade start sequence
+// Reverse stop sequence</div>
+                    <div class="list-item">Photoeyes detect product presence</div>
+                    <div class="list-item">Zero-pressure accumulation prevents product damage</div>
+                    <div class="list-item">Sequential start (last to first) and stop (first to last)</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Tank Level Control</h3>
+                <p>Liquid filling and draining...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Simple Fill Logic:
+|--[START]--[/FULL]--[/ESTOP]--(INLET)|
+|--[INLET]--[/FULL]--[/ESTOP]---------|
+
+With Hysteresis:
+Fill when Level < 20%
+Stop when Level > 80%
+Prevents rapid cycling</div>
+                    <div class="list-item">Use float switches for discrete levels</div>
+                    <div class="list-item">Use pressure transmitters for analog levels</div>
+                    <div class="list-item">Implement high-high alarms for overflow protection</div>
+                    <div class="warning">⚠️ Always include overflow protection and low-level pump protection.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Sequential Control (State Machine)</h3>
+                <p>Step-by-step process automation...</p>
+                <div class="expandable-content">
+                    <div class="code-block">State Machine Example:
+State 0: IDLE - Wait for start
+State 1: FILL - Open inlet valve
+State 2: MIX - Run agitator (timer)
+State 3: HEAT - Enable heater
+State 4: DRAIN - Open outlet valve
+State 5: COMPLETE - Return to idle
+
+Transition conditions move states</div>
+                    <div class="tip">💡 Use integer variables to track current state - easier to troubleshoot than nested logic.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Recipe Management</h3>
+                <p>Batch processing with multiple setpoints...</p>
+                <div class="expandable-content">
+                    <p>Store multiple parameter sets for different products:</p>
+                    <div class="list-item">Temperature setpoints</div>
+                    <div class="list-item">Time durations</div>
+                    <div class="list-item">Speed settings</div>
+                    <div class="list-item">Ingredient quantities</div>
+                    <div class="code-block">Recipe Structure:
+Recipe[1].Temp := 85.0
+Recipe[1].Time := 120
+Recipe[1].Speed := 1500
+
+Load recipe number from HMI
+Apply parameters to process</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Alarm Systems</h3>
+                <p>Process monitoring and notification...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Priority Levels:</strong> Critical, High, Medium, Low, Info</div>
+                    <div class="list-item"><strong>Alarm States:</strong> Active, Acknowledged, Cleared</div>
+                    <div class="list-item"><strong>Time Stamping:</strong> Record when alarm occurred</div>
+                    <div class="code-block">Alarm Logic:
+IF HighTemp AND NOT_AlarmAck THEN
+    AlarmActive := TRUE;
+    FlashingLight := TRUE;
+    HornOutput := TRUE;
+END_IF
+
+Acknowledge button clears horn
+but light stays until condition clears</div>
+                    <div class="tip">💡 Log all alarms to file for historical analysis and compliance.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Packaging Line Control</h3>
+                <p>Coordinated multi-machine automation...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Product tracking through multiple stations</div>
+                    <div class="list-item">Registration control for label placement</div>
+                    <div class="list-item">Reject handling for quality control</div>
+                    <div class="list-item">Count tracking and batch management</div>
+                    <div class="code-block">Bottle Counter Logic:
+CTU Counter: Bottles
+Preset: 24 (case qty)
+When DN bit TRUE:
+  - Stop line
+  - Signal case packer
+  - Reset counter
+  - Resume line</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Traffic Light Control</h3>
+                <p>Classic sequential timing application...</p>
+                <div class="expandable-content">
+                    <div class="code-block">4-Way Intersection Logic:
+State 1: NS_Green (30s timer)
+State 2: NS_Yellow (5s timer)
+State 3: EW_Green (30s timer)
+State 4: EW_Yellow (5s timer)
+
+Add pedestrian buttons:
+- Interrupt cycle
+- Minimum green times
+- Walk/Don't Walk signals</div>
+                    <div class="tip">💡 Great practice project for learning state machines and timers.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hardware & Setup Section -->
+        <div id="hardware" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>⚡ TEST - Hardware Section Active</h3>
+                <p>If you see this, the Hardware section is working!</p>
+                <div class="expandable-content">
+                    <p>This is test content to verify the section loads properly.</p>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>I/O Module Types</h3>
+                <p>Input and output hardware varieties...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Digital Input (DI):</strong> 24VDC, 120VAC, dry contact, sinking/sourcing</div>
+                    <div class="list-item"><strong>Digital Output (DO):</strong> Relay, transistor, triac outputs</div>
+                    <div class="list-item"><strong>Analog Input (AI):</strong> 4-20mA, 0-10V, thermocouple, RTD</div>
+                    <div class="list-item"><strong>Analog Output (AO):</strong> 4-20mA, 0-10V for VFDs and valves</div>
+                    <div class="list-item"><strong>Specialty:</strong> High-speed counter, encoder, weight scale</div>
+                    <div class="code-block">Typical Specifications:
+DI: 8, 16, 32 points per module
+Response: 1-20ms
+Voltage: 24VDC common
+Current: 4-7mA per point</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Wiring Standards</h3>
+                <p>Proper electrical connections...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Color Codes (US):
+BLACK - Line/Hot (L1)
+WHITE - Neutral (N)
+GREEN - Ground (PE)
+RED - Control power
+BLUE - DC Common/Return
+
+Sensor Wiring:
+BROWN - +24VDC
+BLUE - 0VDC/Common
+BLACK - Signal Output</div>
+                    <div class="warning">⚠️ Always follow local electrical codes and manufacturer specifications!</div>
+                    <div class="tip">💡 Label every wire at both ends - future you will thank present you.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Sinking vs Sourcing</h3>
+                <p>Critical DC wiring concept...</p>
+                <div class="expandable-content">
+                    <div class="code-block">SINKING (NPN):
+Device switches 0V/Common
+PLC provides +24V
+Common: Sensor connects to 0V
+
+SOURCING (PNP):
+Device switches +24V
+PLC provides 0V/Common
+Common: Sensor connects to +24V</div>
+                    <div class="warning">⚠️ Mismatching sinking/sourcing will prevent devices from working!</div>
+                    <div class="tip">💡 US/Japan prefer sourcing (PNP), Europe prefers sinking (NPN).</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Power Supply Sizing</h3>
+                <p>Calculating power requirements...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Power Calculation:
+1. CPU consumption: 50-200mA
+2. Each DI point: 4-7mA
+3. Each DO point: varies by load
+4. Communication: 100-300mA
+5. Add 20% safety margin
+
+Example:
+CPU: 100mA
+16 DI: 16 x 5mA = 80mA
+Network: 150mA
+Total: 330mA x 1.2 = 396mA
+Use 500mA minimum supply</div>
+                    <div class="tip">💡 Use separate power supplies for PLC logic and high-current loads.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Grounding & Shielding</h3>
+                <p>Electrical noise protection...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Single-point ground for analog signals</div>
+                    <div class="list-item">Use shielded cables for analog and communication</div>
+                    <div class="list-item">Ground shield at one end only (usually PLC side)</div>
+                    <div class="list-item">Separate power and signal cables by 12 inches minimum</div>
+                    <div class="list-item">Use ferrite cores on noisy cables</div>
+                    <div class="warning">⚠️ Poor grounding causes intermittent faults that are hard to diagnose!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Network Configuration</h3>
+                <p>Setting up industrial networks...</p>
+                <div class="expandable-content">
+                    <div class="code-block">Ethernet/IP Setup:
+IP Address: 192.168.1.10
+Subnet Mask: 255.255.255.0
+Gateway: 192.168.1.1
+
+Network Speed: 100Mbps full-duplex
+Use industrial switches
+Star or ring topology</div>
+                    <div class="list-item">Assign static IPs to all devices</div>
+                    <div class="list-item">Keep network VLAN separate from office</div>
+                    <div class="list-item">Use managed switches for diagnostics</div>
+                    <div class="tip">💡 Document IP addresses in a spreadsheet - essential for troubleshooting.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Backup & Restore Procedures</h3>
+                <p>Protecting your program investment...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Before Changes:</strong> Always backup current working program</div>
+                    <div class="list-item"><strong>Version Control:</strong> Use date/version in filename (PLC_v2.5_2025-01-12)</div>
+                    <div class="list-item"><strong>Full Backup:</strong> Program + configuration + I/O setup + documentation</div>
+                    <div class="list-item"><strong>Test Restore:</strong> Verify backup can be restored before emergency</div>
+                    <div class="code-block">Backup Schedule:
+Daily: Auto-backup if available
+Weekly: Manual full backup
+Monthly: Archive to external storage
+Before changes: ALWAYS backup!</div>
+                    <div class="warning">⚠️ The only backup that matters is the one you made BEFORE the failure!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Preventive Maintenance</h3>
+                <p>Keeping PLCs running reliably...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Monthly:</strong> Check battery voltage, clean dust from vents</div>
+                    <div class="list-item"><strong>Quarterly:</strong> Verify I/O status lights, check terminal tightness</div>
+                    <div class="list-item"><strong>Annually:</strong> Replace battery, thermal imaging scan, backup verification</div>
+                    <div class="code-block">Battery Life Indicators:
+3.0V+ : Good
+2.8-3.0V: Replace soon
+< 2.8V: Replace immediately
+
+Typical battery life: 2-5 years</div>
+                    <div class="warning">⚠️ Low battery can cause program loss during power outages!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>I/O Documentation</h3>
+                <p>Essential reference materials...</p>
+                <div class="expandable-content">
+                    <div class="code-block">I/O List Format:
+Address | Tag Name | Description
+--------|----------|-------------
+I:0/0   | E_Stop_1 | Emergency Stop 1
+I:0/1   | Start_PB | Start Pushbutton
+O:0/0   | Motor_1  | Conveyor Motor
+AI:0    | Temp_1   | Tank Temperature</div>
+                    <div class="list-item">Include wire numbers and panel locations</div>
+                    <div class="list-item">Note sensor/device part numbers</div>
+                    <div class="list-item">Mark critical interlocks and safety circuits</div>
+                    <div class="tip">💡 Keep both electronic and printed copies - printers work during network failures!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Panel Layout Best Practices</h3>
+                <p>Organizing electrical enclosures...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Mount PLC vertically with adequate clearance</div>
+                    <div class="list-item">Maintain minimum 50mm spacing for heat dissipation</div>
+                    <div class="list-item">Use DIN rail for easy module replacement</div>
+                    <div class="list-item">Install cooling fans if ambient > 40°C</div>
+                    <div class="list-item">Wire ducting for organized cable management</div>
+                    <div class="list-item">NEMA 4/IP65 rating for harsh environments</div>
+                    <div class="warning">⚠️ Operating temp range typically 0-55°C - check specifications!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Industry Specific Section -->
+        <div id="industry" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>⚡ TEST - Industry Section Active</h3>
+                <p>If you see this, the Industry section is working!</p>
+                <div class="expandable-content">
+                    <p>This is test content to verify the section loads properly.</p>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>SCADA Integration</h3>
+                <p>Supervisory control and data acquisition...</p>
+                <div class="expandable-content">
+                    <p>SCADA provides centralized monitoring and control of distributed PLCs:</p>
+                    <div class="list-item">Real-time data visualization across multiple sites</div>
+                    <div class="list-item">Historical trending and reporting</div>
+                    <div class="list-item">Alarm management and notification</div>
+                    <div class="list-item">Recipe/batch management from central location</div>
+                    <div class="code-block">SCADA Architecture:
+PLCs → Field Devices
+    ↓ (Ethernet/Serial)
+RTUs → Remote Sites
+    ↓ (Network)
+SCADA Server → Data Collection
+    ↓
+HMI Clients → Operators</div>
+                    <div class="tip">💡 Popular SCADA: Wonderware, Ignition, WinCC, FactoryTalk.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Safety PLCs (SIL Rated)</h3>
+                <p>Critical safety system requirements...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>SIL 1:</strong> Low risk - simple guard monitoring</div>
+                    <div class="list-item"><strong>SIL 2:</strong> Medium risk - emergency stops, light curtains</div>
+                    <div class="list-item"><strong>SIL 3:</strong> High risk - press control, robotics</div>
+                    <div class="list-item"><strong>SIL 4:</strong> Very high risk - aerospace, nuclear</div>
+                    <div class="code-block">Safety PLC Features:
+- Redundant processors
+- Dual-channel inputs
+- Watchdog timers
+- Diagnostic monitoring
+- Certified programming software
+- Safety I/O modules</div>
+                    <div class="warning">⚠️ Safety PLCs require certified programming and regular safety audits!</div>
+                    <div class="tip">💡 Never bypass safety circuits - use proper lockout procedures instead.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Motion Control Integration</h3>
+                <p>Servo and stepper motor control...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Servo Systems:</strong> Closed-loop, high precision, expensive</div>
+                    <div class="list-item"><strong>Stepper Systems:</strong> Open-loop, good precision, cost-effective</div>
+                    <div class="code-block">Common Motion Commands:
+MAM - Move Absolute Move
+MAJ - Move Absolute Jog  
+MRP - Move Relative Position
+MAH - Motion Arm Home
+MSO - Motion Servo On/Off
+
+Position Units:
+- Encoder counts
+- Engineering units (mm, inches)
+- Degrees for rotary</div>
+                    <div class="list-item">Use CAM profiles for complex motion paths</div>
+                    <div class="list-item">Gearing and registration for synchronized axes</div>
+                    <div class="tip">💡 Always home axes on startup to establish position reference.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Water/Wastewater Treatment</h3>
+                <p>Municipal and industrial water systems...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Level control for tanks and reservoirs</div>
+                    <div class="list-item">Pump sequencing and duty rotation</div>
+                    <div class="list-item">Chemical dosing control (pH, chlorine)</div>
+                    <div class="list-item">Flow monitoring and totalizing</div>
+                    <div class="list-item">Pressure management in distribution</div>
+                    <div class="code-block">Pump Alternation Logic:
+Lead_Pump = Pump_Rotation_Bit
+Lag_Pump = NOT Pump_Rotation_Bit
+
+On each cycle complete:
+Toggle Pump_Rotation_Bit
+Equalizes wear on pumps</div>
+                    <div class="tip">💡 Log all chemical dosing for regulatory compliance.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Food & Beverage Processing</h3>
+                <p>Sanitary and compliant automation...</p>
+                <div class="expandable-content">
+                    <div class="list-item">CIP (Clean-In-Place) automated sequences</div>
+                    <div class="list-item">Temperature control for pasteurization</div>
+                    <div class="list-item">Batch tracking for traceability</div>
+                    <div class="list-item">Recipe management for products</div>
+                    <div class="list-item">HACCP compliance monitoring</div>
+                    <div class="code-block">CIP Cycle Example:
+1. Pre-rinse (water)
+2. Caustic wash (hot alkali)
+3. Intermediate rinse
+4. Acid wash (sanitizer)
+5. Final rinse
+6. Drain and dry
+
+Monitor: Temp, flow, concentration</div>
+                    <div class="warning">⚠️ Use stainless steel rated components - IP69K for washdown areas!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Building Automation (BMS)</h3>
+                <p>HVAC and building management systems...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Temperature control zones</div>
+                    <div class="list-item">Occupancy-based scheduling</div>
+                    <div class="list-item">Energy optimization algorithms</div>
+                    <div class="list-item">Lighting control integration</div>
+                    <div class="list-item">Access control interfaces</div>
+                    <div class="code-block">VAV Box Control:
+Measure: Space temp, airflow
+Calculate: Damper position
+Control: Modulating damper
+Setpoint: From schedule
+
+Protocols: BACnet, LonWorks, Modbus</div>
+                    <div class="tip">💡 Implement night setback to reduce energy costs 20-30%.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Oil & Gas Applications</h3>
+                <p>Upstream, midstream, and downstream control...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Pipeline monitoring and leak detection</div>
+                    <div class="list-item">Pump/compressor station automation</div>
+                    <div class="list-item">Tank farm gauging and inventory</div>
+                    <div class="list-item">Separator level control</div>
+                    <div class="list-item">Emergency shutdown (ESD) systems</div>
+                    <div class="code-block">Hazardous Area Classifications:
+Class I: Flammable gases
+  Div 1: Normal conditions
+  Div 2: Abnormal conditions
+
+Zone 0/1/2 (IEC standard)
+
+Use intrinsically safe devices
+Explosion-proof enclosures</div>
+                    <div class="warning">⚠️ Requires certified intrinsically safe equipment and installation!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Pharmaceutical Manufacturing</h3>
+                <p>FDA compliant automation systems...</p>
+                <div class="expandable-content">
+                    <div class="list-item">21 CFR Part 11 electronic records compliance</div>
+                    <div class="list-item">Audit trails for all parameter changes</div>
+                    <div class="list-item">Electronic signatures for batch approval</div>
+                    <div class="list-item">Clean room environmental monitoring</div>
+                    <div class="list-item">Validation documentation (IQ/OQ/PQ)</div>
+                    <div class="code-block">Validation Requirements:
+IQ: Installation Qualification
+  - Verify equipment installed correctly
+OQ: Operational Qualification  
+  - Verify operates per specifications
+PQ: Performance Qualification
+  - Verify consistent production results</div>
+                    <div class="warning">⚠️ All changes require change control documentation and revalidation!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Automotive Manufacturing</h3>
+                <p>High-speed production line automation...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Robot cell coordination (welding, painting)</div>
+                    <div class="list-item">AGV (Automated Guided Vehicle) control</div>
+                    <div class="list-item">Quality inspection integration</div>
+                    <div class="list-item">JIT (Just-In-Time) material handling</div>
+                    <div class="list-item">Andon system for line stop alerts</div>
+                    <div class="code-block">Production Tracking:
+VIN Barcode → PLC memory
+Track through 50+ stations
+Store: timestamps, results, errors
+Upload to MES system
+Traceability for recalls</div>
+                    <div class="tip">💡 Cycle times measured in seconds - optimize scan times carefully!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Renewable Energy Systems</h3>
+                <p>Solar, wind, and battery storage control...</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Solar:</strong> MPPT tracking, inverter control, grid synchronization</div>
+                    <div class="list-item"><strong>Wind:</strong> Pitch control, yaw positioning, cut-in/cut-out speeds</div>
+                    <div class="list-item"><strong>Battery:</strong> SOC monitoring, charge/discharge management, thermal control</div>
+                    <div class="code-block">Grid Connection Requirements:
+- Frequency regulation (59.5-60.5Hz)
+- Voltage control (±5%)
+- Power factor correction
+- Anti-islanding protection
+- Fault ride-through capability
+
+Monitor: kW, kWh, power factor</div>
+                    <div class="tip">💡 Implement remote monitoring for distributed generation sites.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Troubleshooting Section -->
+        <div id="troubleshoot" class="section">
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>⚡ TEST - Troubleshooting Section Active</h3>
+                <p>If you see this, the Troubleshooting section is working!</p>
+                <div class="expandable-content">
+                    <p>This is test content to verify the section loads properly.</p>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Common Errors</h3>
+                <p>Frequent programming issues...</p>
+                <div class="expandable-content">
+                    <div class="warning"><strong>Runtime Faults:</strong> Division by zero, arithmetic overflow, invalid addresses</div>
+                    <div class="warning"><strong>Logic Errors:</strong> Incorrect contact usage, scan time issues, race conditions</div>
+                    <div class="warning"><strong>Hardware Faults:</strong> I/O module failures, communication errors, power issues</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Debugging Techniques</h3>
+                <p>Finding and fixing problems...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Use ONLINE mode to monitor real-time values</div>
+                    <div class="list-item">Force I/O for testing (use caution!)</div>
+                    <div class="list-item">Add watchdog timers for safety</div>
+                    <div class="list-item">Use trending to track variable changes</div>
+                    <div class="list-item">Document with comments and descriptions</div>
+                    <div class="tip">💡 Always test changes in a safe environment before production deployment.</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Best Practices</h3>
+                <p>Professional programming standards...</p>
+                <div class="expandable-content">
+                    <div class="list-item">Use descriptive tag names</div>
+                    <div class="list-item">Comment complex logic thoroughly</div>
+                    <div class="list-item">Organize programs into subroutines</div>
+                    <div class="list-item">Implement emergency stops on every rung</div>
+                    <div class="list-item">Version control your programs</div>
+                    <div class="list-item">Document I/O assignments</div>
+                    <div class="list-item">Test thoroughly before deployment</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Safety Considerations</h3>
+                <p>Critical safety guidelines...</p>
+                <div class="expandable-content">
+                    <div class="warning">⚠️ NEVER bypass safety interlocks</div>
+                    <div class="warning">⚠️ Always implement emergency stop circuits</div>
+                    <div class="warning">⚠️ Use normally closed contacts for safety devices</div>
+                    <div class="warning">⚠️ Test all safety functions before operation</div>
+                    <div class="warning">⚠️ Follow lockout/tagout procedures</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId) {
+            console.log('Showing section:', sectionId);
+            const sections = document.querySelectorAll('.section');
+            const tabs = document.querySelectorAll('.tab');
+            
+            // Hide all sections first
+            sections.forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+            
+            // Remove active from all tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+                selectedSection.style.display = 'block';
+                console.log('Section found and activated');
+            } else {
+                console.error('Section not found:', sectionId);
+            }
+            
+            // Find and activate the clicked tab
+            tabs.forEach(tab => {
+                if (tab.getAttribute('onclick').includes(sectionId)) {
+                    tab.classList.add('active');
+                    // Scroll tab into view
+                    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+        }
+        
+        function toggleExpand(card) {
+            const content = card.querySelector('.expandable-content');
+            if (content) {
+                content.classList.toggle('expanded');
+            }
+        }
+    </script>
+
+</div>
+        
+        <!-- Applications Section -->
+        <div id="applications" class="section">
+            <h2 style="color: #4CAF50; margin-bottom: 15px;">📦 Practical Applications</h2>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Motor Control Circuits</h3>
+                <p>Common motor control patterns for industrial automation</p>
+                <div class="expandable-content">
+                    <div class="code-block">Forward/Reverse Motor:
+|--[FWD_PB]--[/REV]--[/STOP]--(FWD)|
+|--[FWD]-----[/REV]--[/STOP]-------|
+
+|--[REV_PB]--[/FWD]--[/STOP]--(REV)|
+|--[REV]-----[/FWD]--[/STOP]-------|</div>
+                    <div class="warning">⚠️ Always include interlocks!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Conveyor System Logic</h3>
+                <p>Belt and roller conveyor control systems</p>
+                <div class="expandable-content">
+                    <div class="code-block">Multi-Zone Control:
+Zone1_Run = START AND NOT_ESTOP
+Zone2_Run = Zone1_Run AND NOT_Full
+Zone3_Run = Zone2_Run AND Request</div>
+                    <div class="list-item">Sequential start and stop</div>
+                    <div class="list-item">Photoeye detection</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Tank Level Control</h3>
+                <p>Liquid filling and draining automation</p>
+                <div class="expandable-content">
+                    <div class="code-block">Fill Logic:
+|--[START]--[/FULL]--(INLET)|
+Fill when Level < 20%
+Stop when Level > 80%</div>
+                    <div class="warning">⚠️ Include overflow protection!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Sequential Control</h3>
+                <p>Step-by-step process automation</p>
+                <div class="expandable-content">
+                    <div class="code-block">State Machine:
+State 0: IDLE
+State 1: FILL
+State 2: MIX
+State 3: HEAT
+State 4: DRAIN</div>
+                    <div class="tip">💡 Use state variables for tracking</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hardware Section -->
+        <div id="hardware" class="section">
+            <h2 style="color: #4CAF50; margin-bottom: 15px;">🔧 Hardware & Setup</h2>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>I/O Module Types</h3>
+                <p>Input and output hardware varieties</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>Digital Input:</strong> 24VDC, 120VAC</div>
+                    <div class="list-item"><strong>Digital Output:</strong> Relay, transistor</div>
+                    <div class="list-item"><strong>Analog Input:</strong> 4-20mA, 0-10V</div>
+                    <div class="list-item"><strong>Analog Output:</strong> Control VFDs</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Wiring Standards</h3>
+                <p>Proper electrical connections</p>
+                <div class="expandable-content">
+                    <div class="code-block">Color Codes (US):
+BLACK - Line/Hot
+WHITE - Neutral
+GREEN - Ground
+RED - Control power
+BLUE - DC Common</div>
+                    <div class="warning">⚠️ Follow local codes!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Sinking vs Sourcing</h3>
+                <p>Critical DC wiring concept</p>
+                <div class="expandable-content">
+                    <div class="code-block">SINKING (NPN):
+Switches 0V/Common
+
+SOURCING (PNP):
+Switches +24V</div>
+                    <div class="tip">💡 US prefers sourcing (PNP)</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Power Supply Sizing</h3>
+                <p>Calculating power requirements</p>
+                <div class="expandable-content">
+                    <div class="code-block">Calculation:
+CPU: 100mA
+16 DI: 80mA
+Network: 150mA
+Total: 396mA + 20% = 475mA
+Use 500mA supply</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Network Configuration</h3>
+                <p>Setting up industrial networks</p>
+                <div class="expandable-content">
+                    <div class="code-block">Ethernet/IP:
+IP: 192.168.1.10
+Subnet: 255.255.255.0
+Speed: 100Mbps</div>
+                    <div class="tip">💡 Document all IP addresses</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Backup & Restore</h3>
+                <p>Protecting your program investment</p>
+                <div class="expandable-content">
+                    <div class="list-item">Daily: Auto-backup</div>
+                    <div class="list-item">Weekly: Manual backup</div>
+                    <div class="list-item">Before changes: ALWAYS!</div>
+                    <div class="warning">⚠️ Backup before failure!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Industry Section -->
+        <div id="industry" class="section">
+            <h2 style="color: #4CAF50; margin-bottom: 15px;">🏭 Industry Specific</h2>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>SCADA Integration</h3>
+                <p>Supervisory control and data acquisition</p>
+                <div class="expandable-content">
+                    <p>Centralized monitoring of distributed PLCs</p>
+                    <div class="list-item">Real-time data visualization</div>
+                    <div class="list-item">Historical trending</div>
+                    <div class="list-item">Alarm management</div>
+                    <div class="tip">💡 Popular: Wonderware, Ignition, WinCC</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Safety PLCs (SIL Rated)</h3>
+                <p>Critical safety system requirements</p>
+                <div class="expandable-content">
+                    <div class="list-item"><strong>SIL 1:</strong> Low risk</div>
+                    <div class="list-item"><strong>SIL 2:</strong> Medium risk - E-stops</div>
+                    <div class="list-item"><strong>SIL 3:</strong> High risk - Robotics</div>
+                    <div class="list-item"><strong>SIL 4:</strong> Very high - Aerospace</div>
+                    <div class="warning">⚠️ Requires certified programming!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Food & Beverage</h3>
+                <p>Sanitary and compliant automation</p>
+                <div class="expandable-content">
+                    <div class="code-block">CIP Cycle:
+1. Pre-rinse
+2. Caustic wash
+3. Intermediate rinse
+4. Acid wash
+5. Final rinse</div>
+                    <div class="warning">⚠️ Use IP69K components!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Water/Wastewater</h3>
+                <p>Municipal water systems</p>
+                <div class="expandable-content">
+                    <div class="list-item">Level control for tanks</div>
+                    <div class="list-item">Pump sequencing</div>
+                    <div class="list-item">Chemical dosing</div>
+                    <div class="tip">💡 Log dosing for compliance</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Automotive Manufacturing</h3>
+                <p>High-speed production lines</p>
+                <div class="expandable-content">
+                    <div class="list-item">Robot cell coordination</div>
+                    <div class="list-item">AGV control</div>
+                    <div class="list-item">Quality inspection</div>
+                    <div class="code-block">VIN Tracking:
+Barcode → PLC memory
+Track 50+ stations
+Upload to MES</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Troubleshooting Section -->
+        <div id="troubleshoot" class="section">
+            <h2 style="color: #4CAF50; margin-bottom: 15px;">🔍 Troubleshooting</h2>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Common Errors</h3>
+                <p>Frequent programming issues</p>
+                <div class="expandable-content">
+                    <div class="warning"><strong>Runtime Faults:</strong> Division by zero, overflow</div>
+                    <div class="warning"><strong>Logic Errors:</strong> Incorrect contacts, scan time</div>
+                    <div class="warning"><strong>Hardware Faults:</strong> I/O failures, communication</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Debugging Techniques</h3>
+                <p>Finding and fixing problems</p>
+                <div class="expandable-content">
+                    <div class="list-item">Use ONLINE mode to monitor</div>
+                    <div class="list-item">Force I/O for testing</div>
+                    <div class="list-item">Add watchdog timers</div>
+                    <div class="list-item">Use trending for tracking</div>
+                    <div class="tip">💡 Test in safe environment first!</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Best Practices</h3>
+                <p>Professional programming standards</p>
+                <div class="expandable-content">
+                    <div class="list-item">Use descriptive tag names</div>
+                    <div class="list-item">Comment complex logic</div>
+                    <div class="list-item">Organize into subroutines</div>
+                    <div class="list-item">Implement emergency stops</div>
+                    <div class="list-item">Version control programs</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>Safety Considerations</h3>
+                <p>Critical safety guidelines</p>
+                <div class="expandable-content">
+                    <div class="warning">⚠️ NEVER bypass safety interlocks</div>
+                    <div class="warning">⚠️ Always implement emergency stops</div>
+                    <div class="warning">⚠️ Use NC contacts for safety</div>
+                    <div class="warning">⚠️ Test all safety functions</div>
+                    <div class="warning">⚠️ Follow lockout/tagout</div>
+                </div>
+            </div>
+            
+            <div class="card" onclick="toggleExpand(this)">
+                <h3>I/O Troubleshooting</h3>
+                <p>Diagnosing input and output problems</p>
+                <div class="expandable-content">
+                    <div class="code-block">Input Problems:
+- Check LED indicators
+- Verify voltage
+- Test with multimeter
+- Check wiring
+- Replace fuse
+
+Output Problems:
+- Check output LED
+- Verify load voltage
+- Test output forcing
+- Check current draw</div>
+                    <div class="tip">💡 80% of problems are wiring!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId) {
+            console.log('Showing section:', sectionId);
+            const sections = document.querySelectorAll('.section');
+            const tabs = document.querySelectorAll('.tab');
+            
+            sections.forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+                selectedSection.style.display = 'block';
+            }
+            
+            tabs.forEach(tab => {
+                if (tab.getAttribute('onclick').includes(sectionId)) {
+                    tab.classList.add('active');
+                    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+        }
+        
+        function toggleExpand(card) {
+            const content = card.querySelector('.expandable-content');
+            if (content) {
+                content.classList.toggle('expanded');
+            }
+        }
+    </script>
+
+</body>
+</html>
